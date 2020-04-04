@@ -1,0 +1,433 @@
+html, body {
+    /* Settings to preserve pixel art */
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  /* Fullscreen, no edges, no overflow */
+  padding: 0px;
+  overflow: hidden;
+  height: 100%;
+  transition: 1s;
+}
+
+/* Helper classes to use instead of JQuery fadeIn and fadeOut */
+.hidden {
+    opacity: 0;
+}
+
+.none {
+    display: none;
+}
+
+/* Make sure there's no extra spaces (little bit of normalization */
+body {
+    margin: 0px
+}
+
+/* The sega logo image, should be set to full height and centered */
+.splash img {
+    position: fixed;
+    height: 100%;
+    left: 50vw;
+    transform: translateX(-50%);
+    animation: zoom 3s;
+}
+
+ /* Animation for the logo so it zooms in as it fades out at the end */
+@keyframes zoom {
+    0% {
+        transform: translateX(-50%) scale(1)
+    }
+    20% {
+        transform: translateX(-50%) scale(1)
+    }
+    100% {
+        transform: translateX(-50%) scale(1.5)
+    }
+}
+
+/* Container for the logo, sized appropriately with fallback white background */
+.splash {
+    background-color: white;
+    width: 300vw;
+    height: 300vh;
+    /* z-index: 100; */
+    transition: 1s;
+}
+
+/* The game logo */
+.title {
+    position: fixed;
+    left: 25vw;
+    top: 100px;
+    width: 50vw;
+    /* Include perspective definition for flip animation */
+    transform: perspective(400px) rotateY(0deg);
+    transition: 1s;
+}
+
+/* Used to trigger the flip animation, just rotate the logo and fade it out */
+.titleFlip {
+    transform: rotateY(180deg);
+    opacity: 0;
+}
+
+/* The play button, centered near the bottom of the screen */
+.play {
+    position: fixed;
+    width: 12vw;
+    left: 45vw;
+    top: 80vh;
+    border: none;
+    background-color: transparent;
+}
+
+/* Blink the button regularly, hold it solid on hover */
+.play:not(:hover) {
+    animation: glip 0.75s infinite step-end;
+}
+
+/* Simple blink animation, static on, static off, for the play button */
+@keyframes glip {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Ensure any overflow from sprites outside the window limits is hidden */
+.game {
+    overflow: hidden;
+}
+
+/* The background sea and sky image */
+.bg {
+    margin: 0px;
+    height: 400%;
+    top: -130%;
+    left: -50%;
+    position: absolute;
+    display: block;
+    z-index: -10;
+    /* Hand keyframe animation for tilting the background */
+    animation: bg 5s infinite ease-in-out;
+}
+
+/* Animation is synced with the player movement to tilt the background the opposite direction of the player's movement, like the arcade game */
+@keyframes bg {
+    0% {
+        transform: rotate(0deg)
+    }
+    10% {
+        transform: rotate(0deg)
+    }
+    18% {
+        transform: rotate(3deg)
+    }
+    22% {
+        transform: rotate(3deg)
+    }
+    30% {
+        transform: rotate(0deg)
+    }
+    43% {
+        transform: rotate(-6deg)
+    }
+    50% {
+        transform: rotate(-6deg)
+    }
+    60% {
+        transform: rotate(0deg)
+    }
+    70% {
+        transform: rotate(3deg)
+    }
+    80% {
+        transform: rotate(3deg)
+    }
+    90% {
+        transform: rotate(0deg)
+    }
+}
+
+/* General styling for the cloud sprites, default scale 0 to start in the distance in the center of the screen */
+.cloud {
+    position: absolute;
+    left: 50vw;
+    top: 50vh;
+    transform: scale(0);
+}
+
+/* Set individual animations for the cloud, delay the second cloud a little bit */
+.c1 {
+    /* Ease in used to provide perspective-like non-linear scaling curve */
+    animation: cloud1 5s infinite ease-in;
+}
+
+.c2 {
+    animation: cloud2 5s infinite ease-in;
+    animation-delay: 1s;
+}
+
+/* Zoom the cloud past the camera, hide it, reset it, and zoom it past on the other side */
+@keyframes cloud1 {
+    0%{
+        transform: scale(0);
+        top: 50vh;
+    }
+    30% {
+        transform: scale(6);
+        left: -40%;
+        top: 10vh;
+        opacity: 1;
+    }
+    35% {
+        transform: scale(0);
+        left: -40%;
+        top: 10vh;
+        opacity: 0;
+    }
+    60% {
+        transform: scale(0);
+        top: 50vh;
+        left: 50vw;
+        opacity: 1;
+    }
+    90% {
+        transform: scale(10);
+        left: 150%;
+        top: 120vh;
+    }
+    100% {
+        transform: scale(10);
+        left: 150%;
+        top: 120vh;
+    }
+}
+
+/* Second cloud just zooms by on the left once and resets */
+@keyframes cloud2 {
+    0%{
+        transform: scale(0);
+        top: 50vh;
+    }
+    20% {
+        transform: scale(8);
+        left: 0vw;
+        top: 130vh;
+        opacity: 1;
+    }
+    100% {
+        transform: scale(8);
+        left: 0vw;
+        top: 130vh;
+        opacity: 1;
+    }
+    
+}
+
+/* The player sprite itself */
+.player {
+    width: 80px;
+    height: 40px;
+    /* Initial position on the spritesheet for animation */
+    background: url(img/plane.png) -80px 0;
+    /* Default scale for all elements is 4x default size */
+    transform: scale(4) translateX(-6px);
+    position: absolute;
+    left: 50vw;
+    top: 60vh;
+    transition: position;
+    z-index: 0;
+    /* two animations, one for the movement itself and another for the sprite animation
+    Two animations are used so that step-end easing can be used to create instant transitions on the sprite sheet */
+    animation: player 5s infinite ease-in-out, playerSprite 5s infinite step-end;
+}
+
+/* Slide the player around the screen somewhat aesthetically */
+@keyframes player {
+    0% {
+        left: 50vw;
+        top: 60vh;
+    }
+    5% {
+        left: 50vw;
+        top: 60vh;
+    }
+    30% {
+        left: 25vw;
+        top: 50vh;
+    }
+    60% {
+        left: 80vw;
+        top: 60vh;
+    }
+    95% {
+        left: 50vw;
+        top: 60vh;
+    }
+}
+
+/* Hand keyframed sprite transitions to coincide with the movement animation above */
+@keyframes playerSprite {
+    0%{
+        background: url(img/plane.png) -80px 0;
+    }
+    8% {
+        background: url(img/plane.png) 0px 0;
+    }
+    28%{
+        background: url(img/plane.png) -80px 0;
+    }
+    33% {
+        background: url(img/plane.png) 80px 0;
+    }
+    54% {
+        background: url(img/plane.png) -80px 0;
+    }
+    63% {
+        background: url(img/plane.png) 0px 0;
+    }
+    85% {
+        background: url(img/plane.png) -80px 0; 
+    }
+}
+
+/* Default styling for the bullets, all bullets are children of the airplane sprite
+Bullets start as scale zero to prevent FOUC before animation occurs */
+.bullets {
+    position: absolute;
+    left: 41%;
+    /* Transform origin set to slightly above sprite top center to apply perspective transform on scale */
+    transform-origin: 50% -5%;
+    transform: scale(0);
+}
+
+/* Individual bullets only need animation offsets to get them to fire appropriately */
+.b1 {
+    animation: shoot 5s infinite;
+    animation-delay: 1s;
+}
+.b2 {
+    animation: shoot 5s infinite;
+    animation-delay: 1.2s
+}
+.b3 {
+    animation: shoot 5s infinite;
+    animation-delay: 1.1s;
+}
+
+.b4 {
+    animation: shoot 5s infinite;
+    animation-delay: 0.1s;
+}
+.b5 {
+    animation: shoot 5s infinite;
+    animation-delay: 0.3s;
+}
+
+/* Simple shoot animation to scale the bullets, making them appear as if they are moving into the distance */
+@keyframes shoot {
+    0%{
+        transform: scale(1.5)
+    }
+    5% {
+        transform: scale(0);
+    }
+    100% {
+        transform: scale(0)
+    }
+}
+
+/* Default styling for both enemy airplanes */
+.enemy {
+    width: 80px;
+    height: 40px;
+    background: url(img/enemy.png);
+    position: absolute;
+    left: 50vw;
+    top: -20%;
+    transition: position;
+    z-index: -5;
+    /* Start out much larger to show that they are closer to the camera than the player airplane */
+    transform: scale(8);
+}
+
+/* Separate animations and animation offsets for each enemy airplane
+Enemy planes use the same two animation sets like the player plane for smooth movement and sharp sprite transitions */
+.e1 {
+    animation: flybyLeft 5s infinite ease-in-out, bankLeft 5s infinite step-start;
+    animation-delay: -1s;
+}
+
+.e2 {
+    animation: flybyRight 5s infinite ease-in-out, bankRight 5s infinite step-end;
+    animation-delay: s;
+}
+
+/* Enough keyframes for you?? */
+/* Flyby animations are the actual smooth movement, flybyLeft and flybyRight are the same animation just mirrored to opposite sides */
+@keyframes flybyLeft {
+    0% {
+        top: -20%;
+    }
+    30% {
+        left: 40vw;
+    }
+    60% {
+        left: -30%;
+        transform: scale(2);
+        top: 50vh;
+    }
+    100% {
+        left: -30%;
+        transform: scale(2);
+        top: 50vh;
+    }
+}
+
+@keyframes flybyRight {
+    0% {
+        top: -20%;
+    }
+    30% {
+        left: 60vw;
+    }
+    60% {
+        left: 110%;
+        transform: scale(2);
+        top: 50vh;
+    }
+    100% {
+        left: 110%;
+        transform: scale(2);
+        top: 50vh;
+    }
+}
+
+/* BankLeft and bankRight are used to transition the airplane sprites themselves, similar to the player sprite animation */
+@keyframes bankRight {
+    0%{
+        background-position: -80px 0px;
+    }
+    30% {
+        background-position: 80px 0px;
+    }
+    100% {
+        background-position: 80px 0px;
+    }
+}
+
+@keyframes bankLeft {
+    0%{
+        background-position: 0px 0;
+    }
+    30% {
+        background-position: -80px 0;
+    }
+}

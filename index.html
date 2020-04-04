@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title>Animation Final</title>
+		<link rel="stylesheet" href="styles.css">
+	</head>
+	<body>
+		<!-- Container used to hold the various menu elements -->
+		<div class="menu">
+			<img src="img/logo.png" alt="Logo" class="title">
+			<img src="img/play.png" alt="Play" class="play">
+		</div>
+		<!-- Container for all of the game elements -->
+		<div class="game">
+				<img src="img/bg.png" alt="background" class="bg">
+				<img src="img/cloud1.png" alt="cloud" class="cloud c1">
+				<img src="img/cloud2.png" alt="cloud" class="cloud c2">
+				<div class="enemy e1"></div>
+				<div class="enemy e2"></div>
+				<div class="player">
+					<!-- All bullets set as child of airplane for easier styling -->
+					<div class="bullets b1">
+						<img src="img/bullets.png" alt="">
+					</div>
+					<div class="bullets b2">
+						<img src="img/bullets.png" alt="">
+					</div>
+					<div class="bullets b3">
+						<img src="img/bullets.png" alt="">
+					</div>
+					<div class="bullets b4">
+						<img src="img/bullets.png" alt="">
+					</div>
+					<div class="bullets b5">
+						<img src="img/bullets.png" alt="">
+					</div>
+				</div>
+		</div>
+		<!-- Container for the splash screen -->
+		<div class="splash">
+			<img src="img/sega.png" alt="SEGA">
+		</div>
+	</body>
+	<!-- Link JQuery -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script>
+		// On document load, play the splash screen animation
+		$(document).ready(function() {
+			// Fix some auto scrolling issues
+			window.scrollTo(0, 0);
+			//Tried to use JQuery fade in and out, but the results were far too glitchy and unpredictable, so wound up just using classes instead
+			//After 1 second, fade out the splash screen
+			setTimeout(() => {
+				disable($(".splash"))
+			}, 1000)
+		})
+
+		// When the play button is clicked, fade everthing out and then back in (because there's no actual game! Just the menu)
+		$(".play").click(function() {
+			disable($("body"));
+			setTimeout(() => {
+				enable($("body"))
+			}, 1000)
+		})
+
+		// When the logo is clicked, play a little animation on the logo and fade it and the play button out
+		$(".title").click(function() {
+			$(this).toggleClass("titleFlip");
+			$(".play").fadeToggle();
+		})
+
+		//Helper functions in place of JQuery's fadeIn and fadeOut, which seeem to be unreliable with this many nested transforming elements
+		function disable(el) {
+			el.addClass("hidden");
+			//Add a class to hide the element entirely after it's faded out (identical to what JQuery's fadeOut does, but not inline)
+			setTimeout(() => {
+				el.addClass("none")
+			}, 1000);
+		}
+
+		//Exactly undo the above function
+		function enable(el) {
+			el.removeClass("none")
+			setTimeout(() => {
+				el.removeClass("hidden");
+			}, 1000);
+		}
+	</script>
+</html>
